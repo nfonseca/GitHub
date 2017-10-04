@@ -3,12 +3,15 @@ from pyVmomi import Cache
 import ssl
 import atexit
 from pyVmomi import vim
+import vsanmgmtObjects
+
 # import the VSAN API python bindings
 
 #import the vSAN API python bindings
 
 import vsanmgmtObjects
-import vsanapiutils
+
+
 
 s = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 s.verify_mode = ssl.CERT_NONE
@@ -20,9 +23,6 @@ sc = SmartConnect(host='10.27.44.44', user='Administrator@vsphere.local', pwd='V
 # Datacenter Level
 
 dc = sc.content.rootFolder.childEntity[0]
-
-
-
 
 
 # Find by Child Method to retrive hosts
