@@ -51,6 +51,12 @@ def rotateLogs():
         size = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output = size.communicate()[0]
         print output
+        print type(output)
+
+        if int(output) > 32768:
+            print "File is bigger than 32MB"
+        else:
+            print "File is less than 32MB"
 
     except OSError as e:
         print >> sys.stderr, "Execution failed:", e
