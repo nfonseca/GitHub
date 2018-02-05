@@ -142,6 +142,9 @@ regex = 'Removing.[a-z0-9]\{8\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-
 
 # a try block must always have a except.
 
+# function to capture the dump file
+# some improvements needed:
+# add a variable for the parameters like uplink etc
 
 def runDump():
 
