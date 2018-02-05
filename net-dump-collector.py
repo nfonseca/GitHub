@@ -48,7 +48,7 @@ def rotateLogs():
 
     try:
         cmd = "du /tmp/esxdir1.pcap | cut -f1"
-        size = subprocess.popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        size = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output = size.communicate()[0]
         print output
 
