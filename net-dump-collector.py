@@ -128,6 +128,7 @@
 
 
 import subprocess
+import sys
 
 
 log = '/var/log/clomd.log'
@@ -160,7 +161,16 @@ def runDump():
 
 
 
-runDump()
+# Start program
+if __name__ == "__main__":
+    try:
+        runDump()
+    except KeyboardInterrupt:
+        sys.stderr.write('\nDetect: Interrupted\n')
+        sys.exit(1)
+    except Exception as err:
+        sys.stderr.write("[ABNORMAL END]")
+        sys.exit(1)
 
 
 
