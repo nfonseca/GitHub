@@ -52,8 +52,7 @@ def rotateLogs():
         output = size.communicate()[0]
         print output
 
-    except
-        except OSError as e:
+    except OSError as e:
         print >> sys.stderr, "Execution failed:", e
 
 # need a function to stop the capture
