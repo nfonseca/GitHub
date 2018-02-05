@@ -55,6 +55,9 @@ def rotateLogs():
 
         if int(output) > 32768:
             print "File is bigger than 32MB"
+            # we should kill the capture here and start a new dump ?
+            # or have a function to kill the capture and all it here ?
+            # does the check and kill should be done in the MAIN part we we stick to basic functions here ?
         else:
             print "File is less than 32MB"
 
