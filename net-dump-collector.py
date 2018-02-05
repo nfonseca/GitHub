@@ -158,10 +158,15 @@ def runDump():
     except OSError as e:
             print >> sys.stderr, "Execution failed:", e
 
+# need a function to rotate the logs
+
+# need a function to stop the capture
 
 
 
-# Start program
+
+
+# Start main program
 if __name__ == "__main__":
     try:
         runDump()
