@@ -127,7 +127,7 @@
 # -r--r--r--    1 root     root         45515 Oct 18 02:09 zipfile.py
 
 
-
+import subprocess
 
 
 log = '/var/log/clomd.log'
@@ -138,24 +138,26 @@ regex = 'Removing.[a-z0-9]\{8\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-
 
 
 # run the dump function
+# work on the bloack that iniates captures and does the log rotation
+
+# a try block must always have a except.
 
 
 def runDump():
 
     try:
-        retcode = subprocess.call("pktcap-uw" + "--uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap", shell=True)
+        retcode = subprocess.call("pktcap-uw" + " --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap", shell=True)
         if retcode < 0:
             print >> sys.stderr, "Child was terminated by signal", -retcode
         else:
             print >> sys.stderr, "Child returned", retcode
-        except OSError as e:
+    except OSError as e:
             print >> sys.stderr, "Execution failed:", e
 
-#os.system(netdumpcmd)
 
 
 
-# work on the bloack that iniates captures and does the log rotation
+runDump()
 
 
 
