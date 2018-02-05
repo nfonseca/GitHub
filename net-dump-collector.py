@@ -82,10 +82,13 @@ def checkSize():
 
 def main():
 
-    while True:
+    curSize = checkSize()
 
-        if checkSize() < 8:
+    while True:
+        curSize = checkSize()
+        if curSize < 8:
             runDump()
+            checkSize()
         else:
             killDump()
     return 0
