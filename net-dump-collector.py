@@ -40,49 +40,65 @@ def runDump():
         else:
             print >> sys.stderr, "Child returned", retcode
     except OSError as e:
-            print >> sys.stderr, "Execution failed:", e
+            print >> sys.stderr, "Run Dump Execution failed:", e
 
-# need a function to rotate the logs
 
-def rotateLogs():
+
+def killDump():
+
+    try:
+        cmd = "kill $(lsof |grep pktcap-uw |awk '{print $1}'| sort -u)"
+        killPid = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        killOut = killPid.communicate()[0]
+    except OSError as e:
+         print >> sys.stderr, "Kill Dump Execution failed:", e
+
+
+
+def checkSize():
 
     try:
         cmd = "du /tmp/esxdir1.pcap | cut -f1"
         size = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output = size.communicate()[0]
-        print output
-        print type(output)
 
-        if int(output) > 32768:
-            print "File is bigger than 32MB"
-            # we should kill the capture here and start a new dump ?
-            # or have a function to kill the capture and all it here ?
-            # does the check and kill should be done in the MAIN part we we stick to basic functions here ?
-        else:
-            print "File is less than 32MB"
-
+    #     if int(output) > 32768:
+    #         print "File is bigger than 32MB"
+    #         # we should kill the capture here and start a new dump ?
+    #         # or have a function to kill the capture and all it here ?
+    #         # does the check and kill should be done in the MAIN part we we stick to basic functions here ?
+    #     else:
+    #         print "File is less than 32MB"
+    #
     except OSError as e:
-        print >> sys.stderr, "Execution failed:", e
+         print >> sys.stderr, "Check Size Execution failed:", e
 
+    return int(output)
 # need a function to stop the capture
 
 
 
 
 
-# Start main program
+def main():
+
+    while True:
+
+        if checkSize() < 8:
+            runDump()
+        else:
+            killDump()
+    return 0
+
+
+# Start program
 if __name__ == "__main__":
     try:
-        runDump()
-        rotateLogs()
-
+        main()
     except KeyboardInterrupt:
         sys.stderr.write('\nDetect: Interrupted\n')
         sys.exit(1)
     except Exception as err:
-        sys.stderr.write("[ABNORMAL END]")
+        log.error('Caused: %s', err)
+        log.error("[ABNORMAL END]")
         sys.exit(1)
-
-
-
-
