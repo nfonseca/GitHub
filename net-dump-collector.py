@@ -47,9 +47,14 @@ def runDump():
 def rotateLogs():
 
     try:
+        cmd = "du /tmp/esxdir1.pcap | cut -f1"
+        size = subprocess.popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        output = size.communicate()[0]
+        print output
 
     except
-
+        except OSError as e:
+        print >> sys.stderr, "Execution failed:", e
 
 # need a function to stop the capture
 
@@ -61,6 +66,8 @@ def rotateLogs():
 if __name__ == "__main__":
     try:
         runDump()
+        rotateLogs()
+
     except KeyboardInterrupt:
         sys.stderr.write('\nDetect: Interrupted\n')
         sys.exit(1)
