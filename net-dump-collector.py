@@ -13,11 +13,30 @@
 
 import subprocess
 import sys
+import re
+
 
 
 log = '/var/log/clomd.log'
 netdumpcmd ='pktcap-uw --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o esxdir1.pcap'
-regex = 'Removing.[a-z0-9]\{8\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-9]\{12\}.of\stype\sCdbObjectNode\sfrom\sCLOMDB'
+regex = re.compile('Removing.[a-z0-9]\{8\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-9]\{12\}.of\stype\sCdbObjectNode\sfrom\sCLOMDB')
+
+
+
+re1='((?:[a-z][a-z]+))' # Word 1
+re2='(\\s+)'    # White Space 1
+re3='([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})'    # SQL GUID 1
+re4='(\\s+)'    # White Space 2
+re5='((?:[a-z][a-z]+))' # Word 2
+re6='(\\s+)'    # White Space 3
+re7='((?:[a-z][a-z]+))' # Word 3
+re8='(\\s+)'    # White Space 4
+re9='((?:[a-z][a-z]+))' # Word 4
+re10='(\\s+)'   # White Space 5
+re11='((?:[a-z][a-z]+))'        # Word 5
+re12='(\\s+)'   # White Space 6
+re13='((?:[a-z][a-z]+))'        # Word 6
+rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNORECASE|re.DOTALL)
 
 
 
@@ -77,11 +96,31 @@ def checkSize():
 # need a function to stop the capture
 
 
+# scanLog()
+# Function that scans a log file and return 0 if a match is found
+
+
+def scanLog():
+
+    try:
+        print log
+        print regex
+        textfile = open(log, 'r')
+        filetext = textfile.read()
+        textfile.close()
+        if re.findall(rg, filetext):
+            print "Match!"
+        else:
+           print "NO Match"
+
+    except OSError as e:
+         print >> sys.stderr, "Check Size Execution failed:", e
 
 
 
 def main():
 
+    scanLog()
     curSize = checkSize()
     runDump()
     while True:
