@@ -34,7 +34,7 @@ regex = 'Removing.[a-z0-9]\{8\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-
 def runDump():
 
     try:
-        retcode = subprocess.call("pktcap-uw" + " --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap", shell=True)
+        retcode = subprocess.call("pktcap-uw" + " --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap &", shell=True)
         if retcode < 0:
             print >> sys.stderr, "Child was terminated by signal", -retcode
         else:
@@ -83,14 +83,12 @@ def checkSize():
 def main():
 
     curSize = checkSize()
-
+    runDump()
     while True:
         curSize = checkSize()
-        if curSize < 8:
-            runDump()
-            checkSize()
-        else:
+        if curSize > 8:
             killDump()
+
     return 0
 
 
