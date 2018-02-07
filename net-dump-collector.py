@@ -59,7 +59,7 @@ rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNOR
 def runDump():
 
     try:
-        retcode = subprocess.call("pktcap-uw" + " --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap &", shell=True, stdout=devnull)
+        retcode = subprocess.call("pktcap-uw" + " --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap &", shell=True)
         if retcode < 0:
             print >> sys.stderr, "Child was terminated by signal", -retcode
         else:
