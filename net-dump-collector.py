@@ -124,16 +124,28 @@ def scanLog():
 
 def logESX():
     try:
-        retcode = subprocess.call("pktcap-uw" + " --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap &", shell=True)
+        retcode = subprocess.call("esxcli system syslog mark" + " -s 'START_HERE'", shell=True)
         if retcode < 0:
             print >> sys.stderr, "Child was terminated by signal", -retcode
         else:
             print >> sys.stderr, "Child returned", retcode
     except OSError as e:
-        print >> sys.stderr, "Run Dump Execution failed:", e
+        print >> sys.stderr, "logESX Execution failed:", e
 
 # cleanLog()
 # Function that removes the Network Dump
+
+def cleanLog():
+
+    try:
+        retcode = subprocess.call("rm" + " /tmp/esxdir1.pcap", shell=True)
+        if retcode < 0:
+            print >> sys.stderr, "Child was terminated by signal", -retcode
+        else:
+            print >> sys.stderr, "Child returned", retcode
+    except OSError as e:
+        print >> sys.stderr, "cleanLog Execution failed:", e
+
 
 
 def main():
