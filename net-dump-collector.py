@@ -7,13 +7,14 @@
 #   3 - continuosuly monitor and parse a log file and search for a string
 #   4 - if the string is found, then stop the captures and send a message
 
-# variables
+
 
 
 
 import subprocess
 import sys
 import re
+import time
 
 
 
@@ -40,17 +41,6 @@ re13='CLOMDB'        # Word 6
 # #2018-01-16T11:56:57.933Z 33787 Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB
 rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNORECASE|re.DOTALL)
 
-
-
-
-# run the dump function
-# work on the bloack that iniates captures and does the log rotation
-
-# a try block must always have a except.
-
-# function to capture the dump file
-# some improvements needed:
-# add a variable for the parameters like uplink etc
 
 
 
@@ -145,6 +135,16 @@ def cleanLog():
     except OSError as e:
         print >> sys.stderr, "cleanLog Execution failed:", e
 
+# vmSupport()
+# Generates a vm-support log bundle
+
+def vmSupport():
+
+    try:
+        bundle =  subprocess.call("vm-support", shell=True)
+    except OSError as e:
+        print >> sys.stderr, "vm-support Execution failed:", e
+
 
 
 
@@ -154,16 +154,21 @@ def cleanLog():
 
 def main():
 
-    scanLog()
+# we start first the dump
     runDump()
+
     while True:
         curSize = checkSize()
-        if curSize > 8 and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
-            killDump()
-            cleanLog()
-            runDump()
-        elif curSize > 8 and scanLog() == 0: # print Found when a string is foun
-            print "Found"
+        if curSize > 4 and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
+            killDump()      # Kills the Dump
+            cleanLog()      # Deletes the Captures
+            runDump()       # rerun the Dump
+        elif curSize > 4 and scanLog() == 0:
+            logESX()        # Mark ESXi Logs when a string is found and stops the Dump.
+            time.sleep(30)  # sleeps for 30 seconds before killing the dump
+            killDump()      # Kills the Dump after 30 seconds
+            vmSupport()     # Generates a vm-support log bundle from ESXi
+            exit()          # Exit the Python Scrip
 
 
     return 0
