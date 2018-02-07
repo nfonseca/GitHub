@@ -37,6 +37,7 @@ re12='(\\s+)'   # White Space 6
 re13='CLOMDB'        # Word 6
 
 # Regex Compilation that matches exactly a string like: "Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB"
+# #2018-01-16T11:56:57.933Z 33787 Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB
 rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNORECASE|re.DOTALL)
 
 
@@ -110,9 +111,9 @@ def scanLog():
         filetext = textfile.read()
         textfile.close()
         if re.findall(rg, filetext):
-            print "Found a Match!"
+            return 0
         else:
-            print "NO Match"
+            return 1
 
     except OSError as e:
          print >> sys.stderr, "Check Size Execution failed:", e
@@ -157,8 +158,11 @@ def main():
     runDump()
     while True:
         curSize = checkSize()
-        if curSize > 8 and scanLog() == False:
+        if curSize > 8 and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
             killDump()
+            cleanLog()
+            runDump()
+
 
     return 0
 
