@@ -127,7 +127,7 @@ def logESX():
 def cleanLog():
 
     try:
-        retcode = subprocess.call("rm" + " /tmp/esxdir1.pcap", shell=True)
+        retcode = subprocess.call("rm" + " /tmp/esxdir[0-1].pcap", shell=True)
         if retcode < 0:
             print >> sys.stderr, "Child was terminated by signal", -retcode
         else:
@@ -166,6 +166,7 @@ def main():
         elif curSize > 4 and scanLog() == 0:
             logESX()        # Mark ESXi Logs when a string is found and stops the Dump.
             time.sleep(30)  # sleeps for 30 seconds before killing the dump
+            print "Program Sleeping 30s ..."
             killDump()      # Kills the Dump after 30 seconds
             vmSupport()     # Generates a vm-support log bundle from ESXi
             exit()          # Exit the Python Scrip
