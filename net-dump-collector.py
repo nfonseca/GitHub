@@ -106,8 +106,6 @@ def checkSize():
 def scanLog():
 
     try:
-        print log
-        print regex
         textfile = open(log, 'r')
         filetext = textfile.read()
         textfile.close()
@@ -156,14 +154,15 @@ def cleanLog():
 def main():
 
     scanLog()
-    curSize = checkSize()
     runDump()
     while True:
         curSize = checkSize()
-        if curSize > 8:
+        if curSize > 8 and scanLog() == False:
             killDump()
 
     return 0
+
+
 
 
 # Start program
