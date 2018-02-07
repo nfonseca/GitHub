@@ -162,6 +162,8 @@ def main():
             killDump()
             cleanLog()
             runDump()
+        elif curSize > 8 and scanLog() == 0: # print Found when a string is foun
+            print "Found"
 
 
     return 0
