@@ -19,11 +19,10 @@ import re
 
 log = '/var/log/clomd.log'
 netdumpcmd ='pktcap-uw --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o esxdir1.pcap'
-#regex = re.compile('Removing.[a-z0-9]\{8\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-9]\{4\}-[a-z0-9]\{12\}.of\stype\sCdbObjectNode\sfrom\sCLOMDB')
 
 # regex generated using http://txt2re.com/index-python.php3?s=Removing%2059523f9b-04ab-6a30-a574-54ab3a773d8e%20of%20type%20CdbObjectNode%20from%20CLOMDB&6&49&1&50&35&51&12&52&2&53&11&54&8
 
-re1='((?:[a-z][a-z]+))' # Word 1
+re1='Removing' # Word 1
 re2='(\\s+)'    # White Space 1
 re3='([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})'    # SQL GUID 1
 re4='(\\s+)'    # White Space 2
@@ -35,7 +34,9 @@ re9='((?:[a-z][a-z]+))' # Word 4
 re10='(\\s+)'   # White Space 5
 re11='((?:[a-z][a-z]+))'        # Word 5
 re12='(\\s+)'   # White Space 6
-re13='((?:[a-z][a-z]+))'        # Word 6
+re13='CLOMDB'        # Word 6
+
+# Regex Compilation that matches exactly a string like: "Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB"
 rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNORECASE|re.DOTALL)
 
 
@@ -50,10 +51,15 @@ rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNOR
 # some improvements needed:
 # add a variable for the parameters like uplink etc
 
+
+
+# runDump()
+# Function that starts the network dump
+
 def runDump():
 
     try:
-        retcode = subprocess.call("pktcap-uw" + " --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap &", shell=True)
+        retcode = subprocess.call("pktcap-uw" + " --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap &", shell=True, stdout=devnull)
         if retcode < 0:
             print >> sys.stderr, "Child was terminated by signal", -retcode
         else:
@@ -63,16 +69,22 @@ def runDump():
 
 
 
+# killDump()
+# Function that kills the running packet capture
+
 def killDump():
 
     try:
-        cmd = "kill $(lsof |grep pktcap-uw |awk '{print $1}'| sort -u)"
+        cmd = "kill $(lsof |grep pktcap-uw | awk '{print $1}'| sort -u)"
         killPid = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         killOut = killPid.communicate()[0]
     except OSError as e:
          print >> sys.stderr, "Kill Dump Execution failed:", e
 
 
+
+# checkSize()
+# Function that returns the size of the output dump
 
 def checkSize():
 
@@ -81,24 +93,15 @@ def checkSize():
         size = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output = size.communicate()[0]
 
-    #     if int(output) > 32768:
-    #         print "File is bigger than 32MB"
-    #         # we should kill the capture here and start a new dump ?
-    #         # or have a function to kill the capture and all it here ?
-    #         # does the check and kill should be done in the MAIN part we we stick to basic functions here ?
-    #     else:
-    #         print "File is less than 32MB"
-    #
     except OSError as e:
          print >> sys.stderr, "Check Size Execution failed:", e
 
     return int(output)
-# need a function to stop the capture
+
 
 
 # scanLog()
 # Function that scans a log file and return 0 if a match is found
-
 
 def scanLog():
 
@@ -109,13 +112,28 @@ def scanLog():
         filetext = textfile.read()
         textfile.close()
         if re.findall(rg, filetext):
-            print "Match!"
+            print "Found a Match!"
         else:
-           print "NO Match"
+            print "NO Match"
 
     except OSError as e:
          print >> sys.stderr, "Check Size Execution failed:", e
 
+# logESX()
+# Function that marks the ESXi logs with a message
+
+def logESX():
+    try:
+        retcode = subprocess.call("pktcap-uw" + " --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap &", shell=True)
+        if retcode < 0:
+            print >> sys.stderr, "Child was terminated by signal", -retcode
+        else:
+            print >> sys.stderr, "Child returned", retcode
+    except OSError as e:
+        print >> sys.stderr, "Run Dump Execution failed:", e
+
+# cleanLog()
+# Function that removes the Network Dump
 
 
 def main():
