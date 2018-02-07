@@ -148,6 +148,11 @@ def cleanLog():
 
 
 
+
+# main()
+# This is the main program logic based on all the helper functions that will deal with the network capture
+
+
 def main():
 
     scanLog()
