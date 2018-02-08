@@ -7,11 +7,6 @@
 #   3 - continuosuly monitor and parse a log file and search for a string
 #   4 - if the string is found, then stop the captures and send a message
 ############################################################################
-# IMPROVEMENTS
-# Capturdir should redirect to the service datastore automatically. Need to find a way to get the servicedatastore name automatially and implement in teh code
-
-
-
 
 
 import subprocess
@@ -93,7 +88,7 @@ def killDump():
 def checkSize():
 
     try:
-        cmd = "du /vmfs/volumes/"+path+"/*.pcap | awk '{ total += $1 }; END { print total }'"
+        cmd = "ls -l /vmfs/volumes/"+path+"/*.pcap | awk '{ total += $5 }; END { print total }'"
         size = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output = size.communicate()[0]
 
@@ -172,11 +167,11 @@ def main():
 
     while True:
         curSize = checkSize()
-        if curSize > 8 and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
+        if curSize > 42000 and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
             killDump()      # Kills the Dump
             cleanLog()      # Deletes the Captures
             runDump()       # rerun the Dump
-        elif curSize > 8 and scanLog() == 0:
+        elif curSize > 42000 and scanLog() == 0:
             logESX()        # Mark ESXi Logs when a string is found and stops the Dump.
             print "MATCH FOUND: Going to Sleep 30s ..."
             time.sleep(30)  # sleeps for 30 seconds before killing the dump
