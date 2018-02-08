@@ -88,6 +88,7 @@ def killDump():
 
 # checkSize()
 # Function that returns the size of the output dump
+# this works ls -l *.pcap |  awk '{ total += $5 }; END { print total }'
 
 def checkSize():
 
