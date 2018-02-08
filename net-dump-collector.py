@@ -6,6 +6,9 @@
 #   2 - rotate that file and remove it after a while
 #   3 - continuosuly monitor and parse a log file and search for a string
 #   4 - if the string is found, then stop the captures and send a message
+############################################################################
+# IMPROVEMENTS
+# Capturdir should redirect to the service datastore automatically. Need to find a way to get the servicedatastore name automatially and implement in teh code
 
 
 
@@ -17,13 +20,14 @@ import re
 import time
 
 
+# Log file to Monitor
 
 log = '/var/log/clomd.log'
-netdumpcmd ='pktcap-uw --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o esxdir1.pcap'
+
 
 # regex generated using http://txt2re.com/index-python.php3?s=Removing%2059523f9b-04ab-6a30-a574-54ab3a773d8e%20of%20type%20CdbObjectNode%20from%20CLOMDB&6&49&1&50&35&51&12&52&2&53&11&54&8
 
-re1='Removing'                                                          # Word 1
+re1='Removing'                                                          # Word Removing
 re2='(\\s+)'                                                            # White Space 1
 re3='([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})'    # SQL GUID 1
 re4='(\\s+)'                                                            # White Space 2
@@ -35,17 +39,27 @@ re9='((?:[a-z][a-z]+))'                                                 # Word 4
 re10='(\\s+)'                                                           # White Space 5
 re11='((?:[a-z][a-z]+))'                                                # Word 5
 re12='(\\s+)'                                                           # White Space 6
-re13='CLOMDB'                                                           # Word 6
+re13='CLOMDB'                                                           # Word CLOMDB
 
 # Regex Compilation that matches exactly a string like: "Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB"
 # #2018-01-16T11:56:57.933Z 33787" Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB
+
 rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNORECASE|re.DOTALL)
 
-capturedir0 = 'pktcap-uw --uplink vmnic1 --dir 0 -o /tmp/esxdir0.pcap &'
-capturedir1 = 'pktcap-uw --uplink vmnic1 --dir 1 -o /tmp/esxdir1.pcap &'
+# Automatically retrieves service Datastore Path
+
+serviceDatastore="esxcli storage vmfs extent list | grep service | awk '{printf $1}'"
+path =  subprocess.check_output(serviceDatastore,shell=True)
+
 
 # runDump()
 # Function that starts the network dump on dir0 (Rx) and dir1 (Tx)
+
+
+
+capturedir0 = "pktcap-uw --uplink vmnic1 --dir 0 -o "+"/vmfs/volumes/"+path+"/esxdir0.pcap &"
+capturedir1 = "pktcap-uw --uplink vmnic1 --dir 0 -o "+"/vmfs/volumes/"+path+"/esxdir1.pcap &"
+
 
 def runDump():
 
@@ -78,7 +92,7 @@ def killDump():
 def checkSize():
 
     try:
-        cmd = "du /tmp/*.pcap | awk '{ total += $1 }; END { print total }'"
+        cmd = "du /vmfs/volumes/"+path+"/*.pcap | awk '{ total += $1 }; END { print total }'"
         size = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output = size.communicate()[0]
 
@@ -125,7 +139,7 @@ def logESX():
 def cleanLog():
 
     try:
-        retcode = subprocess.call("rm" + " /tmp/esxdir[0-1].pcap", shell=True)
+        retcode = subprocess.call("rm" + " /vmfs/volumes/"+path+"/esxdir[0-1].pcap", shell=True)
         if retcode < 0:
             print >> sys.stderr, "Child was terminated by signal", -retcode
         else:
@@ -163,9 +177,8 @@ def main():
             runDump()       # rerun the Dump
         elif curSize > 8 and scanLog() == 0:
             logESX()        # Mark ESXi Logs when a string is found and stops the Dump.
-            print "Going to Sleep 30s ..."
+            print "MATCH FOUND: Going to Sleep 30s ..."
             time.sleep(30)  # sleeps for 30 seconds before killing the dump
-            print "Program Sleeping 30s ..." # some issues with print command
             killDump()      # Kills the Dump after 30 seconds
             vmSupport()     # Generates a vm-support log bundle from ESXi
             exit()          # Exit the Python Scrip
