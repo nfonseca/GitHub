@@ -23,22 +23,22 @@ netdumpcmd ='pktcap-uw --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o 
 
 # regex generated using http://txt2re.com/index-python.php3?s=Removing%2059523f9b-04ab-6a30-a574-54ab3a773d8e%20of%20type%20CdbObjectNode%20from%20CLOMDB&6&49&1&50&35&51&12&52&2&53&11&54&8
 
-re1='Removing' # Word 1
-re2='(\\s+)'    # White Space 1
+re1='Removing'                                                          # Word 1
+re2='(\\s+)'                                                            # White Space 1
 re3='([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})'    # SQL GUID 1
-re4='(\\s+)'    # White Space 2
-re5='((?:[a-z][a-z]+))' # Word 2
-re6='(\\s+)'    # White Space 3
-re7='((?:[a-z][a-z]+))' # Word 3
-re8='(\\s+)'    # White Space 4
-re9='((?:[a-z][a-z]+))' # Word 4
-re10='(\\s+)'   # White Space 5
-re11='((?:[a-z][a-z]+))'        # Word 5
-re12='(\\s+)'   # White Space 6
-re13='CLOMDB'        # Word 6
+re4='(\\s+)'                                                            # White Space 2
+re5='((?:[a-z][a-z]+))'                                                 # Word 2
+re6='(\\s+)'                                                            # White Space 3
+re7='((?:[a-z][a-z]+))'                                                 # Word 3
+re8='(\\s+)'                                                            # White Space 4
+re9='((?:[a-z][a-z]+))'                                                 # Word 4
+re10='(\\s+)'                                                           # White Space 5
+re11='((?:[a-z][a-z]+))'                                                # Word 5
+re12='(\\s+)'                                                           # White Space 6
+re13='CLOMDB'                                                           # Word 6
 
 # Regex Compilation that matches exactly a string like: "Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB"
-# #2018-01-16T11:56:57.933Z 33787 Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB
+# #2018-01-16T11:56:57.933Z 33787" Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB
 rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNORECASE|re.DOTALL)
 
 capturedir0 = 'pktcap-uw --uplink vmnic1 --dir 0 -o /tmp/esxdir0.pcap &'
