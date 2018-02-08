@@ -41,17 +41,17 @@ re13='CLOMDB'        # Word 6
 # #2018-01-16T11:56:57.933Z 33787 Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB
 rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNORECASE|re.DOTALL)
 
-capturedir0 = 'pktcap-uw --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 0 -o /tmp/esxdir0.pcap'
-capturedir1 = 'pktcap-uw --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap'
+capturedir0 = 'pktcap-uw --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 0 -o /tmp/esxdir0.pcap &'
+capturedir1 = 'pktcap-uw --uplink vmnic1 --ip 224.2.3.4 --ip 224.1.2.3 --dir 1 -o /tmp/esxdir1.pcap &'
 
 # runDump()
-# Function that starts the network dump
+# Function that starts the network dump on dir0 (Rx) and dir1 (Tx)
 
 def runDump():
 
     try:
-        retcodedir0 = subprocess.call(capturedir0, shell=True)
-        retcodedir1 = subprocess.call(capturedir1, shell=True)
+        dir0 = subprocess.call(capturedir0, shell=True)
+        dir1 = subprocess.call(capturedir1, shell=True)
 
     except OSError as e:
             print >> sys.stderr, "Run Dump Execution failed:", e
@@ -160,9 +160,11 @@ def main():
         if curSize > 4 and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
             killDump()      # Kills the Dump
             cleanLog()      # Deletes the Captures
+            print "Going for another Run ..."
             runDump()       # rerun the Dump
         elif curSize > 4 and scanLog() == 0:
             logESX()        # Mark ESXi Logs when a string is found and stops the Dump.
+            print "Going to Sleep 30s ..."
             time.sleep(30)  # sleeps for 30 seconds before killing the dump
             print "Program Sleeping 30s ..."
             killDump()      # Kills the Dump after 30 seconds
