@@ -7,12 +7,10 @@
 #   3 - continuosuly monitor and parse a log file and search for a string
 #   4 - if the string is found, then stop the captures and send a message
 ############################################################################
-# IMPROVEMENTS
-# Capturdir should redirect to the service datastore automatically. Need to find a way to get the servicedatastore name automatially and implement in teh code
 
 
 
-
+# MODULES NEEDED
 
 import subprocess
 import sys
@@ -21,7 +19,7 @@ import time
 import os
 
 
-# Log file to Monitor
+# Log file to Monitor and Scan
 
 log = '/var/log/clomd.log'
 
@@ -87,23 +85,8 @@ def killDump():
 
 
 
-# checkSize()
-# Function that returns the size of the output dump
-# this works ls -l *.pcap |  awk '{ total += $5 }; END { print total }'
-
-# def checkSize():
-#
-#     try:
-#         cmd = "ls -l /vmfs/volumes/"+path+"/*.pcap | awk '{ total += $5 }; END { print total }'"
-#         size = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-#         output = size.communicate()[0]
-#
-#     except OSError as e:
-#          print >> sys.stderr, "Check Size Execution failed:", e
-#
-#     return int(output)
-
-# Function that returns the sum size of the files
+# newCheckSize()
+# Function that returns the sum size of the dump files in the dump directory
 
 def newCheckSize():
     dumpdir = '/dumps'
