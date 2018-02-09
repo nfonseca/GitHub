@@ -7,6 +7,11 @@
 #   3 - continuosuly monitor and parse a log file and search for a string
 #   4 - if the string is found, then stop the captures and send a message
 ############################################################################
+# IMPROVEMENTS
+# Capturdir should redirect to the service datastore automatically. Need to find a way to get the servicedatastore name automatially and implement in teh code
+
+
+
 
 
 import subprocess
@@ -97,6 +102,28 @@ def checkSize():
 
     return int(output)
 
+# Function that returns the sum size of the files
+
+def newCheckSize():
+    dumpdir = '/dumps'
+    basepath = '/vmfs/volumes/'
+    pathnew = basepath + path + dumpdir
+
+    try:
+
+        sizearray = []
+
+
+        for pcap in os.listdir(pathnew):
+            z = os.path.getsize(pathnew + '/' + pcap)
+            sizearray.append(int(z))
+
+        total = sum(sizearray)
+
+    except OSError as e:
+        print >> sys.stderr, "Check Size Execution failed:", e
+
+    return total
 
 
 # scanLog()
