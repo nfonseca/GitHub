@@ -18,6 +18,7 @@ import subprocess
 import sys
 import re
 import time
+import os
 
 
 # Log file to Monitor
@@ -57,8 +58,8 @@ path =  subprocess.check_output(serviceDatastore,shell=True)
 
 
 
-capturedir0 = "pktcap-uw --uplink vmnic1 --dir 0 -o "+"/vmfs/volumes/"+path+"/esxdir0.pcap &"
-capturedir1 = "pktcap-uw --uplink vmnic1 --dir 0 -o "+"/vmfs/volumes/"+path+"/esxdir1.pcap &"
+capturedir0 = "pktcap-uw --uplink vmnic1 --dir 0 -o "+"/vmfs/volumes/"+path+"/dumps/esxdir0.pcap &"
+capturedir1 = "pktcap-uw --uplink vmnic1 --dir 1 -o "+"/vmfs/volumes/"+path+"/dumps/esxdir1.pcap &"
 
 
 def runDump():
@@ -90,17 +91,17 @@ def killDump():
 # Function that returns the size of the output dump
 # this works ls -l *.pcap |  awk '{ total += $5 }; END { print total }'
 
-def checkSize():
-
-    try:
-        cmd = "ls -l /vmfs/volumes/"+path+"/*.pcap | awk '{ total += $5 }; END { print total }'"
-        size = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-        output = size.communicate()[0]
-
-    except OSError as e:
-         print >> sys.stderr, "Check Size Execution failed:", e
-
-    return int(output)
+# def checkSize():
+#
+#     try:
+#         cmd = "ls -l /vmfs/volumes/"+path+"/*.pcap | awk '{ total += $5 }; END { print total }'"
+#         size = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+#         output = size.communicate()[0]
+#
+#     except OSError as e:
+#          print >> sys.stderr, "Check Size Execution failed:", e
+#
+#     return int(output)
 
 # Function that returns the sum size of the files
 
@@ -162,7 +163,7 @@ def logESX():
 def cleanLog():
 
     try:
-        retcode = subprocess.call("rm" + " /vmfs/volumes/"+path+"/esxdir[0-1].pcap", shell=True)
+        retcode = subprocess.call("rm" + " /vmfs/volumes/"+path+"/dumps/esxdir[0-1].pcap", shell=True)
         if retcode < 0:
             print >> sys.stderr, "Child was terminated by signal", -retcode
         else:
@@ -193,7 +194,7 @@ def main():
     runDump()
 
     while True:
-        curSize = checkSize()
+        curSize = newCheckSize()
         if curSize > 42000 and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
             killDump()      # Kills the Dump
             cleanLog()      # Deletes the Captures
