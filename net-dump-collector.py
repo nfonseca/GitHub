@@ -1,5 +1,4 @@
 #!/bin/python
-
 #   script that collects network dumps when a condition is met from the logs
 #   functions that the script has to perform:
 #   1 - take continuous network dumps from a vmnic to a file
@@ -17,6 +16,7 @@ import sys
 import re
 import time
 import os
+
 
 
 # Log file to Monitor and Scan
@@ -164,8 +164,15 @@ def vmSupport():
     except OSError as e:
         print >> sys.stderr, "vm-support Execution failed:", e
 
+# createDumpDir()
+# Function that creates the dump directory where dumps are saved
 
+def createDumpDir():
 
+    try:
+        dumpdir = os.mkdir("/vmfs/volumes/"+path+"/dumps")
+    except OSError as e:
+            print >> sys.stderr, "createDumpDir Execution failed:", e
 
 # main()
 # This is the main program logic based on all the helper functions that will deal with the network capture
@@ -173,6 +180,8 @@ def vmSupport():
 
 def main():
 
+# initalize dumpdir
+    createDumpDir()
 # we start first the dump
     runDump()
 
