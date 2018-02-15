@@ -18,9 +18,10 @@ import time
 import os
 
 
+# maxsize of dump files 128MB
+maxsize = 134217728
 
 # Log file to Monitor and Scan
-
 log = '/var/log/clomd.log'
 
 
@@ -82,7 +83,6 @@ def killDump():
         killOut = killPid.communicate()[0]
     except OSError as e:
          print >> sys.stderr, "Kill Dump Execution failed:", e
-
 
 
 # newCheckSize()
@@ -187,11 +187,11 @@ def main():
 
     while True:
         curSize = newCheckSize()
-        if curSize > 42000 and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
+        if curSize > maxsize and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
             killDump()      # Kills the Dump
             cleanLog()      # Deletes the Captures
             runDump()       # rerun the Dump
-        elif curSize > 42000 and scanLog() == 0:
+        elif curSize > maxsize and scanLog() == 0:
             logESX()        # Mark ESXi Logs when a string is found and stops the Dump.
             print "MATCH FOUND: Going to Sleep 30s ..."
             time.sleep(30)  # sleeps for 30 seconds before killing the dump
