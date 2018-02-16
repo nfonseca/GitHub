@@ -42,7 +42,7 @@ re12='(\\s+)'                                                           # White 
 re13='CLOMDB'                                                           # Word CLOMDB
 
 # Regex Compilation that matches exactly a string like: "Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB"
-# #2018-01-16T11:56:57.933Z 33787" Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB
+# #2018-01-16T11:56:57.933Z 33787 Removing 59523f9b-04ab-6a30-a574-54ab3a773d8e of type CdbObjectNode from CLOMDB
 
 rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13,re.IGNORECASE|re.DOTALL)
 
@@ -193,6 +193,7 @@ def main():
             killDump()      # Kills the Dump
             time.sleep(3)   # To fix a race condition where rundump was called while previous process not killed
             cleanLog()      # Deletes the Captures
+            time.sleep(1)   # Wait 1 sec after deleting teh logs and starting a new dump
             runDump()       # rerun the Dump
         elif curSize > maxsize and scanLog() == 0:
             logESX()        # Mark ESXi Logs when a string is found and stops the Dump.
