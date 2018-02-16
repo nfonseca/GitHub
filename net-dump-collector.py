@@ -189,6 +189,7 @@ def main():
         curSize = newCheckSize()
         if curSize > maxsize and scanLog() == 1: # test that the size is small and that we dont have a match so we can kill the dump/clean the log and start a new dump
             killDump()      # Kills the Dump
+            time.sleep(3)   # To fix a race condition where rundump was called while previous process not killed
             cleanLog()      # Deletes the Captures
             runDump()       # rerun the Dump
         elif curSize > maxsize and scanLog() == 0:
