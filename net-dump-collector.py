@@ -89,10 +89,12 @@ def killDump():
 # Function that returns the sum size of the dump files in the dump directory
 
 def newCheckSize():
+
     dumpdir = '/dumps'
     basepath = '/vmfs/volumes/'
     pathnew = basepath + path + dumpdir
     total = 0
+
     try:
 
         sizearray = []
