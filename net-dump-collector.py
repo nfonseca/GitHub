@@ -170,7 +170,8 @@ def vmSupport():
 def createDumpDir():
 
     try:
-        dumpdir = os.mkdir("/vmfs/volumes/"+path+"/dumps")
+        if not os.path.exists("/vmfs/volumes/"+path+"/dumps"):
+            dumpdir = os.mkdir("/vmfs/volumes/"+path+"/dumps")
     except OSError as e:
             print >> sys.stderr, "createDumpDir Execution failed:", e
 
@@ -213,6 +214,5 @@ if __name__ == "__main__":
         sys.stderr.write('\nDetect: Interrupted\n')
         sys.exit(1)
     except Exception as err:
-        log.error('Caused: %s', err)
-        log.error("[ABNORMAL END]")
+        print >> sys.stderr, "createDumpDir Execution failed:", err
         sys.exit(1)
