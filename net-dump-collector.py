@@ -92,11 +92,10 @@ def newCheckSize():
     dumpdir = '/dumps'
     basepath = '/vmfs/volumes/'
     pathnew = basepath + path + dumpdir
-
+    total = 0
     try:
 
         sizearray = []
-
 
         for pcap in os.listdir(pathnew):
             z = os.path.getsize(pathnew + '/' + pcap)
