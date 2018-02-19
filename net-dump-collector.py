@@ -217,5 +217,5 @@ if __name__ == "__main__":
         sys.stderr.write('\nDetect: Interrupted\n')
         sys.exit(1)
     except Exception as err:
-        print >> sys.stderr, "createDumpDir Execution failed:", err
+        print >> sys.stderr, "Main Execution Failed:", err
         sys.exit(1)
